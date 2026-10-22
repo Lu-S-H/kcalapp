@@ -2,12 +2,12 @@
 import { BODYFAT_MAX_AGE_DAYS, KCAL_PER_KG } from './config.js';
 import { addDays, ageOn, diffDays, todayStr, weekStart } from './util.js';
 
+// 活動係數只代表「日常生活」的活動量，不含運動；運動依紀錄另外加進每日消耗。
 export const ACTIVITY_LEVELS = [
-  { value: 1.2, label: '幾乎不運動', desc: '久坐上班，沒有固定運動' },
-  { value: 1.375, label: '輕度活動', desc: '每週運動 1～3 天' },
-  { value: 1.55, label: '中度活動', desc: '每週運動 3～5 天' },
-  { value: 1.725, label: '高度活動', desc: '每週運動 6～7 天' },
-  { value: 1.9, label: '非常高', desc: '體力勞動工作，或每天高強度訓練' },
+  { value: 1.2, label: '久坐', desc: '辦公室工作、開車或搭車通勤，一天走路不多' },
+  { value: 1.3, label: '輕度走動', desc: '常站著或走路通勤，一天大約 7,000～10,000 步' },
+  { value: 1.4, label: '經常走動', desc: '工作時大多站著走動，例如服務業、護理、教學' },
+  { value: 1.5, label: '體力工作', desc: '搬運、工地、外送等需要大量體力的工作' },
 ];
 
 export function activityLabel(factor) {
@@ -133,12 +133,23 @@ export function bmrFor(state, date) {
   };
 }
 
-/** 每日總消耗 = 基礎代謝 × 活動係數（係數已含運動，運動紀錄不另外加） */
+/**
+ * 單筆運動的淨消耗：紀錄的熱量扣掉同一段時間本來就會消耗的基礎代謝，避免和基礎代謝重複計算。
+ * 例：基礎代謝 1,680、慢跑 30 分鐘估 291 大卡 → 291 − 1680 × 30 / 1440 ≈ 256 大卡。
+ */
+export function exerciseNet(e, bmrValue) {
+  return Math.max(0, e.kcal - (bmrValue * e.minutes) / 1440);
+}
+
+/** 每日總消耗 = 基礎代謝 × 日常活動係數 + 當天運動的淨消耗 */
 export function tdeeFor(state, date) {
   const bmr = bmrFor(state, date);
   const phase = phaseFor(state, date);
   if (!bmr || !phase) return null;
-  return { ...bmr, bmr: bmr.value, factor: phase.activityFactor, value: bmr.value * phase.activityFactor };
+  const base = bmr.value * phase.activityFactor;
+  let exercise = 0;
+  for (const e of exercisesOn(state, date)) exercise += exerciseNet(e, bmr.value);
+  return { ...bmr, bmr: bmr.value, factor: phase.activityFactor, base, exercise, value: base + exercise };
 }
 
 export function intakeOn(state, date) {

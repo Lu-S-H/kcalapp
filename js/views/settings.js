@@ -29,10 +29,10 @@ function activityChoices(factor) {
       )}
       <div class="row choice" role="radio" data-factor="custom" aria-checked="${isCustom}" tabindex="-1">
         ${icon('check', 'check')}<label class="grow" for="f-factor">自訂係數</label>
-        <input id="f-factor" name="customFactor" type="text" inputmode="decimal" value="${isCustom ? factor : ''}" placeholder="例如 1.45" autocomplete="off" style="width: 90px; border: 0; background: none; text-align: right; font-size: var(--fs-body)">
+        <input id="f-factor" name="customFactor" type="text" inputmode="decimal" value="${isCustom ? factor : ''}" placeholder="例如 1.35" autocomplete="off" style="width: 90px; border: 0; background: none; text-align: right; font-size: var(--fs-body)">
       </div>
     </div>
-    <p class="field-note">這個係數已經包含你的運動量，所以記錄的運動不會再另外加進每日消耗。</p>`;
+    <p class="field-note">只看日常生活（工作、通勤、家事），<b>不含運動</b>。運動請另外記錄，會依當天的運動紀錄加進每日消耗。</p>`;
 }
 
 export function bindActivity(root, onChange) {
@@ -101,7 +101,7 @@ export function bindGoal(root, getContext) {
       '。';
     root.querySelector('[data-goal-preview]').innerHTML = tdee
       ? html`<div class="card-label">每日熱量目標</div><div class="mid">${fmt(target)}<small>大卡</small></div>
-          <div class="sub">每日消耗 ${fmt(tdee)} ${offset ? fmtSigned(offset) : '±0'}</div>`.__html
+          <div class="sub">日常消耗 ${fmt(tdee)} ${offset ? fmtSigned(offset) : '±0'}，有運動的日子會再加上運動消耗</div>`.__html
       : '<p class="note" style="margin:0">有體重資料後會顯示每日熱量目標。</p>';
   };
   bindSegmented(root, (seg, v) => {
@@ -407,8 +407,9 @@ function openAboutSheet() {
             <p class="note">瘦體重公式（Katch-McArdle）：370 + 21.6 × 體重 × (1 − 體脂率)。有體脂資料時通常較準。</p>
           </div>
           <div class="card">
-            <p style="margin-top:0"><b>每日消耗（TDEE）</b> = 基礎代謝 × 活動係數。</p>
-            <p class="note">活動係數已經包含你平常的運動量，所以記錄的運動只當作日誌，不另外加進每日消耗，避免重複計算。</p>
+            <p style="margin-top:0"><b>每日消耗（TDEE）</b> = 基礎代謝 × 日常活動係數 + 當天運動的淨消耗。</p>
+            <p class="note">日常活動係數只看工作、通勤、家事，不含運動。運動依每天的紀錄另外加上，所以運動多的日子，每日消耗和熱量目標都會跟著增加。</p>
+            <p class="note">運動的淨消耗 = 運動消耗 − 基礎代謝 × 運動分鐘數 ÷ 1,440，扣掉這段時間就算不運動也會消耗的熱量，避免重複計算。</p>
             <p class="note">每一天都用「當天或之前最近一次」的體重與體脂計算，之後量到新數字也不會改寫以前的結果。</p>
           </div>
           <div class="card">
@@ -417,7 +418,7 @@ function openAboutSheet() {
             <p class="note">理論體重變化以每公斤約 7,700 大卡換算。</p>
           </div>
           <div class="card">
-            <p style="margin-top:0"><b>運動消耗</b> = MET 值 × 體重(kg) × 時間(小時)，MET 參考 Compendium of Physical Activities。</p>
+            <p style="margin-top:0"><b>運動消耗</b> = MET 值 × 體重(kg) × 時間(小時)，MET 參考 Compendium of Physical Activities。也可以自己填手錶上的數字。</p>
           </div>
           <div class="card">
             <p style="margin-top:0"><b>食物資料來源</b></p>

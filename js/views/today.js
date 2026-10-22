@@ -44,7 +44,7 @@ function balanceCard(s, isToday) {
           <div class="sub">${isToday ? `今日熱量目標 ${fmt(target)} 大卡` : '不列入每週平均與圖表統計'}</div>`
       : html`<div class="card-label">${s.balance >= 0 ? '盈餘' : '赤字'}</div>
           <div class="hero ${s.balance >= 0 ? 'surplus' : 'deficit'}">${fmtSigned(s.balance)}<small>大卡</small></div>
-          <div class="sub">攝取 ${fmt(s.intake.kcal)} − 每日消耗 ${fmt(s.tdee.value)}</div>`;
+          <div class="sub">攝取 ${fmt(s.intake.kcal)} − 每日消耗 ${fmt(s.tdee.value)}${s.tdee.exercise ? `（含運動 ${fmt(s.tdee.exercise)}）` : ''}</div>`;
   return html`<div class="card">
     ${head}
     <div class="target-line">
@@ -99,7 +99,7 @@ function mealSections(date) {
   });
 }
 
-function exerciseSection(date) {
+function exerciseSection(date, s) {
   const list = exercisesOn(state, date);
   if (!list.length) return '';
   return html`<div class="meal-h"><h3>運動</h3><span class="num">${fmt(list.reduce((t, e) => t + e.kcal, 0))} 大卡</span></div>
@@ -111,7 +111,7 @@ function exerciseSection(date) {
         </button></li>`,
       )}
     </ul>
-    <p class="sec-foot">運動消耗只當作紀錄，不加進每日消耗。</p>`;
+    <p class="sec-foot">${s.tdee ? `扣掉這段時間本來就會消耗的基礎代謝後，淨消耗 ${fmt(s.tdee.exercise)} 大卡已加進每日消耗與熱量目標。` : '有體重資料後，運動消耗會加進每日消耗。'}</p>`;
 }
 
 function firstTimeGuide() {
@@ -160,7 +160,7 @@ export function renderToday(main) {
       ${miniCards(s)}
       ${firstTimeGuide()}
       ${mealSections(date)}
-      ${exerciseSection(date)}
+      ${exerciseSection(date, s)}
       ${s.status !== 'none'
         ? html`<div class="sec-h"></div>
           <div class="form"><div class="field">

@@ -1,5 +1,5 @@
 // 運動的 MET 值（參考 Compendium of Physical Activities）。
-// 消耗熱量 = MET × 體重(kg) × 時間(小時)。只當作日誌，不加進每日消耗。
+// 消耗熱量 = MET × 體重(kg) × 時間(小時)。扣掉同時段的基礎代謝後，加進當天的每日消耗（見 calc.js exerciseNet）。
 export const EXERCISE_GROUPS = [
   {
     name: '重量訓練',

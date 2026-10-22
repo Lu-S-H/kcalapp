@@ -1,5 +1,5 @@
 // 離線快取。改版時把 VERSION 改掉（並同步修改 js/config.js），手機就會出現「有新版本」提示。
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CACHE = `kcalapp-${VERSION}`;
 
 const ASSETS = [

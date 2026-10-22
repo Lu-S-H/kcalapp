@@ -64,12 +64,34 @@ function sortCollections() {
   state.exerciseLogs.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
 }
 
+// 計算版本 2：活動係數改成「不含運動」，運動另外加進每日消耗。
+// 舊資料（或舊備份）裡的係數是含運動的，一律改成 1.2（久坐），避免和運動重複計算。
+const TDEE_MODEL = 2;
+const MIGRATED_FACTOR = 1.2;
+
+function migrate() {
+  if (state.settings.tdeeModel === TDEE_MODEL) return false;
+  const hadPhases = state.phases.length > 0;
+  for (const ph of state.phases) {
+    if (ph.activityFactor !== MIGRATED_FACTOR) {
+      ph.activityFactor = MIGRATED_FACTOR;
+      persist(db.putRecord('phases', ph));
+    }
+  }
+  state.settings = { ...state.settings, tdeeModel: TDEE_MODEL };
+  persist(db.putSettings(state.settings));
+  return hadPhases;
+}
+
+/** 回傳 { migrated }：是否把舊的活動係數改成了 1.2 */
 export async function load() {
   const data = await db.loadAll();
   state.settings = { ...defaultSettings(), ...(data.settings || {}) };
   for (const name of Object.keys(COLLECTIONS)) state[name] = data[name] || [];
   sortCollections();
+  const migrated = migrate();
   changed();
+  return { migrated };
 }
 
 export function saveSettings(patch) {
@@ -114,6 +136,7 @@ export async function replaceAll(data) {
   state.settings = { ...defaultSettings(), ...(data.settings || {}) };
   for (const name of Object.keys(COLLECTIONS)) state[name] = [...(data[name] || [])];
   sortCollections();
+  migrate(); // 還原舊版備份檔時也要轉換
   changed();
 }
 

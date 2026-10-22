@@ -152,8 +152,9 @@ document.addEventListener('visibilitychange', () => {
 
 // ---------- 啟動 ----------
 async function boot() {
+  let loaded;
   try {
-    await store.load();
+    loaded = await store.load();
   } catch (err) {
     console.error(err);
     onbEl.hidden = false;
@@ -169,6 +170,7 @@ async function boot() {
   store.onChange(scheduleRender);
   store.onError((msg) => toast(msg));
   render();
+  if (loaded.migrated) toast('運動消耗現在會加進每日消耗，活動量已改為「久坐 × 1.2」，可到「設定」調整');
   // 請求「持續保存」，降低資料被系統清除的機會
   navigator.storage?.persist?.().catch(() => {});
   registerSW();

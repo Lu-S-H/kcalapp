@@ -582,7 +582,7 @@ function exerciseForm(body, sh, ctx, type, editing) {
         <div class="field"><input class="wide" name="note" type="text" placeholder="備註（選填），例如：胸＋三頭" value="${editing?.note || ''}" aria-label="備註" autocomplete="off"></div>
       </div>
       <p class="field-note" data-est></p>
-      <p class="field-note">運動消耗只當作紀錄，不會加進每日消耗（每日消耗用的活動係數已經包含運動）。</p>
+      <p class="field-note">會扣掉這段時間本來就會消耗的基礎代謝，再加進當天的每日消耗與熱量目標。</p>
       ${editing ? html`<div class="sec-h"></div><div class="list"><button type="button" class="row danger" data-delete>刪除這筆紀錄</button></div>` : ''}
       <div class="actions"><button type="button" class="btn-primary" data-save>儲存</button></div>`,
   );

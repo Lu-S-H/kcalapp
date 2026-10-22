@@ -16,7 +16,7 @@ const TOTAL = 4;
 let ob = null;
 
 function reset() {
-  ob = { step: 0, profile: null, kg: null, bodyFatPct: null, factor: 1.55, goal: null };
+  ob = { step: 0, profile: null, kg: null, bodyFatPct: null, factor: 1.2, goal: null };
 }
 
 function bmrOf() {
@@ -74,7 +74,7 @@ function stepBody() {
 }
 
 function stepActivity() {
-  return html`${head(3, '平常的活動量', '選最接近你平常一週的狀況，包含運動。')}
+  return html`${head(3, '日常活動量', '選最接近你平常工作與生活的狀況，不含運動。運動之後另外記錄，會自動加進當天的消耗。')}
     ${activityFields(ob.factor)}
     ${nav()}`;
 }
@@ -100,12 +100,12 @@ function done() {
     <div class="result-grid">
       <div class="two" style="margin:0">
         <div class="card"><div class="card-label">基礎代謝</div><div class="mid">${fmt(bmr)}<small>大卡</small></div></div>
-        <div class="card"><div class="card-label">每日消耗</div><div class="mid">${fmt(tdee)}<small>大卡</small></div></div>
+        <div class="card"><div class="card-label">日常消耗</div><div class="mid">${fmt(tdee)}<small>大卡</small></div></div>
       </div>
       <div class="card">
         <div class="card-label">每日熱量目標</div>
         <div class="mid">${fmt(tdee + g.kcalOffset)}<small>大卡</small></div>
-        <div class="sub">每日消耗 ${fmt(tdee)} ${g.kcalOffset ? fmtSigned(g.kcalOffset) : '±0'}</div>
+        <div class="sub">日常消耗 ${fmt(tdee)} ${g.kcalOffset ? fmtSigned(g.kcalOffset) : '±0'}，有運動的日子會再加上運動消耗</div>
         <div class="sub">蛋白質 ${fmt(g.proteinG)} g · 碳水 ${fmt(g.carbG)} g</div>
       </div>
     </div>

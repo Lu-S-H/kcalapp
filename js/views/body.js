@@ -78,7 +78,7 @@ function metabolismCard(today) {
       <div class="card"><div class="card-label">每日消耗</div><div class="mid">${fmt(t.value)}<small>大卡</small></div></div>
     </div>
     <p class="field-note" style="margin-top:0">基礎代謝公式：${BMR_METHOD_NAMES[t.method]}，${how}。${t.fallback ? '（沒有近 90 天的體脂紀錄，暫時改用身高體重公式）' : ''}<br>
-    每日消耗 = 基礎代謝 × ${activityLabel(t.factor)}，已包含運動。</p>`;
+    每日消耗 = 基礎代謝 × ${activityLabel(t.factor)}${t.exercise ? `，加上今天運動淨消耗 ${fmt(t.exercise)} 大卡` : '，有運動時會再加上運動消耗'}。</p>`;
 }
 
 function weightList() {
